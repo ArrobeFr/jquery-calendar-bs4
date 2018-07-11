@@ -1,0 +1,49 @@
+{
+  "name": "arrobefr-jquery-calendar-bs4",
+  "version": "1.0.0",
+  "description": "A responsive jquery calendar scheduler built with bootstrap 4 and moment.js",
+  "main": "dist/js/jquery-calendar.min.js",
+  "scripts": {
+    "css-minify": "cleancss --level 2 --output dist/css/jquery-calendar.min.css src/css/jquery-calendar.css",
+    "js-minify": "uglifyjs --compress --mangle --toplevel --comments /^@/ --output dist/js/jquery-calendar.min.js src/js/jquery-calendar.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ArrobeFr/jquery-calendar-bs4.git"
+  },
+  "keywords": [
+    "jquery-plugin",
+    "ecosystem:jquery",
+    "moment.js",
+    "bootstrap",
+    "bootstrap4",
+    "bootstrap 4",
+    "calendar",
+    "scheduler",
+    "responsive"
+  ],
+  "author": "Arrobe Fr <contact@arrobe.fr> (https://www.arrobe.fr)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ArrobeFr/jquery-calendar-bs4/issues"
+  },
+  "homepage": "https://github.com/ArrobeFr/jquery-calendar-bs4#readme",
+  "dependencies": {
+    "@fortawesome/fontawesome-free-webfonts": "^1",
+    "bootstrap": "^4",
+    "jquery": "^3",
+    "jquery-touchswipe": "^1.6",
+    "moment": "^2.22",
+    "popper.js": "^1.14"
+  },
+  "devDependencies": {
+    "clean-css-cli": "^4",
+    "uglify-js": "^3"
+  },
+  "files": [
+    "dist/",
+    "src/",
+    "README.md",
+    "LICENSE"
+  ]
+}

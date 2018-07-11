@@ -12,11 +12,11 @@ Screenshots are made using the `example/example.html`. There is events on one we
 
 ### Desktop user
 
-![screenshots/Desktop user.gif](https://raw.githubusercontent.com/ArrobeFr/jquery-calendar/master/screenshots/Desktop%20user.gif)
+![screenshots/Desktop user.gif](https://raw.githubusercontent.com/ArrobeFr/jquery-calendar-bs4/master/screenshots/Desktop%20user.gif)
 
 ### Mobile user
 
-![screenshots/Mobile user.gif](https://raw.githubusercontent.com/ArrobeFr/jquery-calendar/master/screenshots/Mobile%20user.gif)
+![screenshots/Mobile user.gif](https://raw.githubusercontent.com/ArrobeFr/jquery-calendar-bs4/master/screenshots/Mobile%20user.gif)
 
 ## Installation
 
