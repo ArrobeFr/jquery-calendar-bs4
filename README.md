@@ -29,8 +29,8 @@ Screenshots are made using the `example/example.html`. There is events on one we
 *use of the latest version on cdn.jsdelivr.net*
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/arrobefr-jquery-calendar-bs4@1.0.5/dist/js/jquery-calendar.min.js"></script>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/arrobefr-jquery-calendar-bs4@1.0.5/dist/css/jquery-calendar.min.css">
+<script src="https://cdn.jsdelivr.net/npm/arrobefr-jquery-calendar-bs4@1.0.0/dist/js/jquery-calendar.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/arrobefr-jquery-calendar-bs4@1.0.0/dist/css/jquery-calendar.min.css">
 ```
 
 ## Usage
