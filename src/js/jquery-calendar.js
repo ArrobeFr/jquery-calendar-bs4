@@ -352,14 +352,15 @@ jQuery(document).ready(function($){
     time = moment(moment()).startOf('Week');
     time.add(this.conf.weekday.timeline.fromHour, 'H');
 
-    i = this.conf.weekday.timeline.fromHour;
-    while (i < this.conf.weekday.timeline.toHour){
+    var limit = (((this.conf.weekday.timeline.toHour+1)*60) - (this.conf.weekday.timeline.fromHour * 60)) / this.conf.weekday.timeline.intervalMinutes;
+    var i = 0;
+    while (i < limit){
       li = $('<li>');
       li.append($('<span>').text(time.format(this.conf.weekday.timeline.format)));
       li.height(this.conf.weekday.timeline.heightPx);
       ul.append(li);
-      i = parseInt(time.format('HH'));
       time.add(this.conf.weekday.timeline.intervalMinutes, 'm');
+      i++;
     }
   };
 
@@ -424,7 +425,7 @@ jQuery(document).ready(function($){
       li.append(div);
       li.attr('data-time', time.startOf('day').format('X'));
       li.append($('<ul>'));
-      li.find('ul').height(((60 / this.conf.weekday.timeline.intervalMinutes) * (this.conf.weekday.timeline.toHour - this.conf.weekday.timeline.fromHour) * this.conf.weekday.timeline.heightPx) + this.conf.weekday.timeline.heightPx);
+      li.find('ul').height(((60 / this.conf.weekday.timeline.intervalMinutes) * (this.conf.weekday.timeline.toHour - this.conf.weekday.timeline.fromHour) * this.conf.weekday.timeline.heightPx) + ((60 / this.conf.weekday.timeline.intervalMinutes) * this.conf.weekday.timeline.heightPx));
       ul.append(li);
     }
 
@@ -831,8 +832,9 @@ jQuery(document).ready(function($){
       day = false;
       fromHour = this.conf.weekday.timeline.fromHour;
       toHour = this.conf.weekday.timeline.toHour;
+      interval = this.conf.weekday.timeline.intervalMinutes;
       $(this.element).find('.calendar-events-day').each(function(i, d){
-        if (e.start >= (parseInt($(d).attr('data-time'))+fromHour*60*60) && e.end <= (parseInt($(d).attr('data-time'))+toHour*60*60)){
+        if (e.start >= (parseInt($(d).attr('data-time'))+fromHour*60*60) && e.end <= (parseInt($(d).attr('data-time'))+toHour*60*60)+((60/interval)*interval*60)){
           day = d;
         }
       });
