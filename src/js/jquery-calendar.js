@@ -341,7 +341,8 @@ jQuery(document).ready(function($){
     $(this.element).find('div.calendar-timeline').css('padding-top', this.conf.weekday.dayline.heightPx+'px');
     var marginTop = this.conf.weekday.dayline.month.heightPx;
     if (this.conf.categories.enable){
-      marginTop += 30;
+      var $categoryBar = $(this.element).find('div.calendar-categories');
+      marginTop += $categoryBar.height() + parseFloat($categoryBar.css('margin-bottom'));
     }
     $(this.element).find('div.calendar-timeline').css('margin-top', marginTop+'px');
 
@@ -438,6 +439,12 @@ jQuery(document).ready(function($){
     $(this.element).find('.calendar-day-header').each(function(){
       $(this).height(maxHeight);
     });
+
+    if (this.conf.weekday.dayline.heightPx < maxHeight) {
+      this.conf.weekday.dayline.heightPx = maxHeight;
+      $(this.element).find('div.calendar-timeline').css('padding-top', this.conf.weekday.dayline.heightPx + 'px');    // W: Padding-top do cabeçalho dos dias da semana
+      // alert(this.conf.weekday.dayline.heightPx + " " + $(this.element).find('.calendar-day-header').first().css('height'));
+    }
   };
 
   Calendar.prototype.monthDrawWeek = function() {
