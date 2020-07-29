@@ -1,6 +1,7 @@
 /*
  * @class Calendar ~jquery-calendar plugin~ (https://github.com/ArrobeFr/jquery-calendar-bs4)
  * @author Developped by Arrobe (https://www.arrobe.fr)
+ * Some Improvements, refactorizations and fixes: M. A. Coma Rivas
  * @license Licensed under MIT (https://github.com/ArrobeFr/jquery-calendar/blob/master/LICENSE)
  */
 
@@ -213,125 +214,133 @@ jQuery(document).ready(function($){
   };
 
   Calendar.prototype.defaultEvents = function() {
-    if (this.binded == undefined){
-      var eventMouseenterDefault = function(event, self, elem){
-        if (!event.isDefaultPrevented()){
-          if (parseInt(elem.css('top')) >= (elem.closest('ul').height() / 2) - self.conf.weekday.timeline.heightPx){
-            heightPx = parseInt(elem.css('top')) + parseInt(elem.css('height'));
-            elem
-              .css('z-index', 10)
-              .animate({
-                height:heightPx,
-                top:0,
-                width:'100%',
-                left:0
-              }, 50)
-            ;
-          }else{
-            heightPx = elem.closest('ul').height() - parseInt(elem.css('top'));
-            elem
-              .css('z-index', 10)
-              .animate({
-                height:heightPx,
-                width:'100%',
-                left:0
-              }, 50)
-            ;
-          }
-          elem.find('.event-name').removeClass('invisible');
-          elem.find('.event-content').removeClass('invisible');
-        }
-      };
-      $(self.element).off('Calendar.event-mouseenter', eventMouseenterDefault).on('Calendar.event-mouseenter', eventMouseenterDefault);
-      $(self.element).off('Calendar.daynote-mouseenter', eventMouseenterDefault).on('Calendar.daynote-mouseenter', eventMouseenterDefault);
-      var eventMouseleaveDefault = function(event, self, elem){
-        if (!event.isDefaultPrevented()){
+    if (this.binded == true){
+      return
+    }
+    var self = this;
+    var eventMouseenterDefault = function(event, self, elem){
+      if (!event.isDefaultPrevented()){
+        if (parseInt(elem.css('top')) >= (elem.closest('ul').height() / 2) - self.conf.weekday.timeline.heightPx){
+          var heightPx = parseInt(elem.css('top')) + parseInt(elem.css('height'));
           elem
-            .css('z-index', 'auto')
+            .css('z-index', 10)
             .animate({
-              height:parseFloat(elem.attr('data-height'))+'px',
-              top:parseFloat(elem.attr('data-top')),
-              width:parseFloat(elem.attr('data-width'))+'%',
-              left:parseFloat(elem.attr('data-left'))+'%'
+              height:heightPx,
+              top:0,
+              width:'100%',
+              left:0
             }, 50)
           ;
-          elem.find('.event-content').addClass('invisible');
+        }else{
+          var heightPx = elem.closest('ul').height() - parseInt(elem.css('top'));
+          elem
+            .css('z-index', 10)
+            .animate({
+              height:heightPx,
+              width:'100%',
+              left:0
+            }, 50)
+          ;
         }
-      };
-      $(self.element).off('Calendar.event-mouseleave', eventMouseleaveDefault).on('Calendar.event-mouseleave', eventMouseleaveDefault);
-      $(self.element).off('Calendar.daynote-mouseleave', eventMouseleaveDefault).on('Calendar.daynote-mouseleave', eventMouseleaveDefault);
-      var eventClickDefault = function(event, self, elem, evt){
-        if (!event.isDefaultPrevented()){
-          modal = $(self.element).find('#calendar-modal');
-          rgb = self.hexToRgb(elem.attr('data-color'));
-          modal.css('background', 'rgba('+rgb.r+', '+rgb.g+', '+rgb.b+', 0.5)');
-          modal.find('.modal-title').append(elem.attr('data-title')+' ');
-          modal.find('.modal-body').append(
-            $('<h4>').append(
-              $(this).closest('.calendar-events-day').find('span').html()
-            ).append(
-              ' '
-            ).append(
-              $('<small>').text(elem.find('.event-date').text())
-            )
-          );
-          modal.find('.modal-body').append(elem.find('.event-content').html());
-          modal.modal('show');
-          modal.on('hidden.bs.modal', function (e) {
-            $(e.target).find('.modal-title').html('');
-            $(e.target).find('.modal-body').html('');
+        elem.find('.event-name').removeClass('invisible');
+        elem.find('.event-content').removeClass('invisible');
+      }
+    };
+    $(self.element).off('Calendar.event-mouseenter', eventMouseenterDefault).on('Calendar.event-mouseenter', eventMouseenterDefault);
+    $(self.element).off('Calendar.daynote-mouseenter', eventMouseenterDefault).on('Calendar.daynote-mouseenter', eventMouseenterDefault);
+
+    var eventMouseleaveDefault = function(event, self, elem){
+      if (!event.isDefaultPrevented()){
+        elem
+          .css('z-index', 'auto')
+          .animate({
+            height:parseFloat(elem.attr('data-height'))+'px',
+            top:parseFloat(elem.attr('data-top')),
+            width:parseFloat(elem.attr('data-width'))+'%',
+            left:parseFloat(elem.attr('data-left'))+'%'
+          }, 50)
+        ;
+        elem.find('.event-content').addClass('invisible');
+      }
+    };
+    $(self.element).off('Calendar.event-mouseleave', eventMouseleaveDefault).on('Calendar.event-mouseleave', eventMouseleaveDefault);
+    $(self.element).off('Calendar.daynote-mouseleave', eventMouseleaveDefault).on('Calendar.daynote-mouseleave', eventMouseleaveDefault);
+
+    var eventClickDefault = function(event, self, elem, evt){
+      if (!event.isDefaultPrevented()){
+        var modal = $(self.element).find('#calendar-modal');
+        var rgb = self.hexToRgb(elem.attr('data-color'));
+        modal.css('background', 'rgba('+rgb.r+', '+rgb.g+', '+rgb.b+', 0.5)');
+        modal.find('.modal-title').append(elem.attr('data-title')+' ');
+        modal.find('.modal-body').append(
+          $('<h4>').append(
+            $(this).closest('.calendar-events-day').find('span').html()
+          ).append(
+            ' '
+          ).append(
+            $('<small>').text(elem.find('.event-date').text())
+          )
+        );
+        modal.find('.modal-body').append(elem.find('.event-content').html());
+        modal.modal('show');
+        modal.on('hidden.bs.modal', function (e) {
+          $(e.target).find('.modal-title').html('');
+          $(e.target).find('.modal-body').html('');
+        });
+      }
+    };
+    $(self.element).off('Calendar.event-click', eventClickDefault).on('Calendar.event-click', eventClickDefault);
+    $(self.element).off('Calendar.daynote-click', eventClickDefault).on('Calendar.daynote-click', eventClickDefault);
+
+    var eventCategoryClickDefault = function(event, self, elem){
+      if (!event.isDefaultPrevented()){
+        var events = self.element.find('.calendar-event[data-category="'+$(elem).text()+'"]');
+        if ($(elem).attr('data-clicked') == 'false'){
+          events.animate({
+            opacity: 0
+          }, 200, function(){
+            events.css('display', 'none');
+            $(elem).css('background-color', '#E0E0E0');
+            $(elem).attr('data-clicked', true);
           });
         }
-      };
-      $(self.element).off('Calendar.event-click', eventClickDefault).on('Calendar.event-click', eventClickDefault);
-      $(self.element).off('Calendar.daynote-click', eventClickDefault).on('Calendar.daynote-click', eventClickDefault);
-      var eventCategoryClickDefault = function(event, self, elem){
-        if (!event.isDefaultPrevented()){
-          var events = self.element.find('.calendar-event[data-category="'+$(elem).text()+'"]');
-          if ($(elem).attr('data-clicked') == 'false'){
-            events.animate({
-              opacity: 0
-            }, 200, function(){
-              events.css('display', 'none');
-              $(elem).css('background-color', '#E0E0E0');
-              $(elem).attr('data-clicked', true);
-            });
+        if ($(elem).attr('data-clicked') == 'true'){
+          events.css('display', 'list-item');
+          $(elem).css('background-color', $(elem).attr('data-color'));
+          events.animate({
+            opacity: 1
+          }, 200, function(){
+            $(elem).attr('data-clicked', false);
+          });
+        }
+      }
+    };
+    $(self.element).off('Calendar.category-event-click', eventCategoryClickDefault).on('Calendar.category-event-click', eventCategoryClickDefault);
+    $(self.element).off('Calendar.category-daynote-click', eventCategoryClickDefault).on('Calendar.category-daynote-click', eventCategoryClickDefault);
+
+    var eventCategoryMouseenterDefault = function(event, self, elem){
+      if (!event.isDefaultPrevented()){
+        self.element.find('.calendar-event').each(function(i, e){
+          if ($(e).attr('data-category') != elem.text()){
+            $(e).css('opacity', 0.2);
           }
-          if ($(elem).attr('data-clicked') == 'true'){
-            events.css('display', 'list-item');
-            $(elem).css('background-color', $(elem).attr('data-color'));
-            events.animate({
-              opacity: 1
-            }, 200, function(){
-              $(elem).attr('data-clicked', false);
-            });
-          }
-        }
-      };
-      $(self.element).off('Calendar.category-event-click', eventCategoryClickDefault).on('Calendar.category-event-click', eventCategoryClickDefault);
-      $(self.element).off('Calendar.category-daynote-click', eventCategoryClickDefault).on('Calendar.category-daynote-click', eventCategoryClickDefault);
-      var eventCategoryMouseenterDefault = function(event, self, elem){
-        if (!event.isDefaultPrevented()){
-          self.element.find('.calendar-event').each(function(i, e){
-            if ($(e).attr('data-category') != elem.text()){
-              $(e).css('opacity', 0.2);
-            }
-          });
-        }
-      };
-      $(self.element).off('Calendar.category-event-mouseenter', eventCategoryMouseenterDefault).on('Calendar.category-event-mouseenter', eventCategoryMouseenterDefault);
-      $(self.element).off('Calendar.category-daynote-mouseenter', eventCategoryMouseenterDefault).on('Calendar.category-daynote-mouseenter', eventCategoryMouseenterDefault);
-      var eventCategoryMouseleaveDefault = function(event, self, elem){
-        if (!event.isDefaultPrevented()){
-          self.element.find('.calendar-event').each(function(i, e){
-            $(e).css('opacity', 1);
-          });
-        }
-      };
-      $(self.element).off('Calendar.category-event-mouseleave', eventCategoryMouseleaveDefault).on('Calendar.category-event-mouseleave', eventCategoryMouseleaveDefault);
-      $(self.element).off('Calendar.category-daynote-mouseleave', eventCategoryMouseleaveDefault).on('Calendar.category-daynote-mouseleave', eventCategoryMouseleaveDefault);
-      this.binded = true;
-    }
+        });
+      }
+    };
+    $(self.element).off('Calendar.category-event-mouseenter', eventCategoryMouseenterDefault).on('Calendar.category-event-mouseenter', eventCategoryMouseenterDefault);
+    $(self.element).off('Calendar.category-daynote-mouseenter', eventCategoryMouseenterDefault).on('Calendar.category-daynote-mouseenter', eventCategoryMouseenterDefault);
+
+    var eventCategoryMouseleaveDefault = function(event, self, elem){
+      if (!event.isDefaultPrevented()){
+        self.element.find('.calendar-event').each(function(i, e){
+          $(e).css('opacity', 1);
+        });
+      }
+    };
+    $(self.element).off('Calendar.category-event-mouseleave', eventCategoryMouseleaveDefault).on('Calendar.category-event-mouseleave', eventCategoryMouseleaveDefault);
+    $(self.element).off('Calendar.category-daynote-mouseleave', eventCategoryMouseleaveDefault).on('Calendar.category-daynote-mouseleave', eventCategoryMouseleaveDefault);
+
+    this.binded = true;
   };
 
   Calendar.prototype.weekDrawTime = function() {
@@ -348,9 +357,9 @@ jQuery(document).ready(function($){
 
     $(this.element).find('div.calendar-timeline').append($('<ul>'));
 
-    ul = $(this.element).find('div.calendar-timeline').find('ul');
+    var li, ul = $(this.element).find('div.calendar-timeline').find('ul');
 
-    time = moment(moment()).startOf('Week');
+    var time = moment(moment()).startOf('Week');
     time.add(this.conf.weekday.timeline.fromHour, 'H');
 
     var limit = (((this.conf.weekday.timeline.toHour+1)*60) - (this.conf.weekday.timeline.fromHour * 60)) / this.conf.weekday.timeline.intervalMinutes;
@@ -389,7 +398,7 @@ jQuery(document).ready(function($){
 
     $(this.element).find('div.calendar-events').append($('<ul>'));
 
-    ul = $(this.element).find('div.calendar-events').find('ul');
+    var li, ul = $(this.element).find('div.calendar-events').find('ul');
 
     var days = this.getViewDays();
 
@@ -408,19 +417,20 @@ jQuery(document).ready(function($){
         div.append($('<button>', {
           class: 'btn btn-sm btn-light btn-move-calendar'
         }).attr('data-direction', 'left').append($('<i>', {
-          class: 'fas fa-arrow-left'
+          class: 'las la-angle-left'
         })));
       }
       div.append($('<span>')
         .addClass('weektoday')
         .css('width', '100%')
-        .text(this.miscUcfirstString(time.format(this.conf.weekday.dayline.format)))
+        .html(this.miscUcfirstString(time.format(this.conf.weekday.dayline.format)))
       );
+
       if (i == days.length - 1 && this.mobileQuery() == 'desktop'){
         div.append($('<button>', {
           class: 'btn btn-sm btn-light btn-move-calendar'
         }).attr('data-direction', 'right').append($('<i>', {
-          class: 'fas fa-arrow-right'
+          class: 'las la-angle-right'
         })));
       }
       li.append(div);
@@ -445,6 +455,7 @@ jQuery(document).ready(function($){
       $(this.element).find('div.calendar-timeline').css('padding-top', this.conf.weekday.dayline.heightPx + 'px');    // W: Padding-top do cabeçalho dos dias da semana
       // alert(this.conf.weekday.dayline.heightPx + " " + $(this.element).find('.calendar-day-header').first().css('height'));
     }
+
   };
 
   Calendar.prototype.monthDrawWeek = function() {
@@ -462,7 +473,7 @@ jQuery(document).ready(function($){
       })
         .attr('data-direction', 'left')
         .append($('<i>', {
-          class: 'fas fa-arrow-left'
+          class: 'las la-angle-left'
         }))
       );
     }
@@ -480,7 +491,7 @@ jQuery(document).ready(function($){
         .css('float', 'right')
         .attr('data-direction', 'right')
         .append($('<i>', {
-          class: 'fas fa-arrow-right'
+          class: 'las la-angle-right'
         }))
       );
     }
@@ -488,7 +499,7 @@ jQuery(document).ready(function($){
     $(this.element).find('div.calendar-events').append(div);
     $(this.element).find('div.calendar-events').append($('<ul>'));
 
-    ul = $(this.element).find('div.calendar-events').find('ul');
+    var li, ul = $(this.element).find('div.calendar-events').find('ul');
 
     var time = moment.unix(this.conf.unixTimestamp).startOf('month');
     var month = parseInt(time.format('MM'));
@@ -503,8 +514,8 @@ jQuery(document).ready(function($){
     }
 
     for (var i=0; i<this.conf.month.dayheader.weekdays.length; i++){
-      var time = moment().startOf('week').add(this.conf.month.dayheader.weekdays[i], 'days');
-      var li = $('<li>', {
+      time = moment().startOf('week').add(this.conf.month.dayheader.weekdays[i], 'days');
+      li = $('<li>', {
         class: 'calendar-month-day-header'
       });
       li.append($('<div>')
@@ -542,7 +553,7 @@ jQuery(document).ready(function($){
     $(this.element).find('div.calendar-timeline').css('margin-top', marginTop+'px');
     $(this.element).find('div.calendar-timeline').append($('<ul>'));
 
-    ul = $(this.element).find('div.calendar-timeline').find('ul');
+    var li, ul = $(this.element).find('div.calendar-timeline').find('ul');
 
     var time = moment.unix(this.conf.unixTimestamp).startOf('month');
     var month = parseInt(time.format('MM'));
@@ -565,22 +576,23 @@ jQuery(document).ready(function($){
   };
 
   Calendar.prototype.monthDrawWeekDays = function() {
-    var days = this.getViewDays();
+    var days = this.getViewDays(), targetUl, li;
 
     var i = parseInt(moment.unix(days[0]).weekday());
     var time = moment.unix(days[0]);
     while (i>0){
       time = time.subtract(1, 'days');
-      var targetUl = this.element.find(".calendar-events>ul>.calendar-month-day-header>div:contains('"+this.miscUcfirstString(time.format(this.conf.month.dayheader.format))+"')").parent().find('ul');
-      var li = $('<li>');
+      targetUl = this.element.find(".calendar-events>ul>.calendar-month-day-header>div:contains('"+this.miscUcfirstString(time.format(this.conf.month.dayheader.format))+"')").parent().find('ul');
+      li = $('<li>');
       li.css('height', this.conf.month.weekline.heightPx+'px');
       $(targetUl).append(li);
       i--;
     }
 
-    for (var i=0; i<days.length; i++){
-      var targetUl = this.element.find(".calendar-events>ul>.calendar-month-day-header>div:contains('"+this.miscUcfirstString(moment.unix(days[i]).format(this.conf.month.dayheader.format))+"')").parent().find('ul');
-      var li = $('<li>', {
+    time = days.length;
+    for (i=0; i<time; i++){
+      targetUl = this.element.find(".calendar-events>ul>.calendar-month-day-header>div:contains('"+this.miscUcfirstString(moment.unix(days[i]).format(this.conf.month.dayheader.format))+"')").parent().find('ul');
+      li = $('<li>', {
         class: 'calendar-month-events-day'
       });
       li.css('height', this.conf.month.weekline.heightPx+'px');
@@ -600,11 +612,11 @@ jQuery(document).ready(function($){
     this.determineDaynotesCategories();
 
     if (this.conf.categories.enable){
-      var div = $('<div>', {
+      var label, div = $('<div>', {
         class:'calendar-categories'
       }).css('height', '26px');
       for (var i=0; i<this.eventCategoryColor.length; i++){
-        var label = $('<span>', {
+        label = $('<span>', {
           class: 'badge badge-default calendar-label'
         });
         label.css('margin-right', '5px');
@@ -615,8 +627,8 @@ jQuery(document).ready(function($){
         label.text(this.eventCategoryColor[i].category);
         div.append(label);
       }
-      for (var i=0; i<this.daynoteCategoryColor.length; i++){
-        var label = $('<span>', {
+      for (i=0; i<this.daynoteCategoryColor.length; i++){
+        label = $('<span>', {
           class: 'badge badge-default calendar-label calendar-label-daynote'
         });
         label.css('margin-right', '5px');
@@ -634,7 +646,7 @@ jQuery(document).ready(function($){
   };
 
   Calendar.prototype.hoverCategory = function(){
-    var self = this;
+    var setTimeoutConst, elem, self = this;
     this.element.find('.calendar-label').hover(
       function(){
         elem = $(this);
@@ -671,7 +683,7 @@ jQuery(document).ready(function($){
   };
 
   Calendar.prototype.clickCategory = function(){
-    var self = this;
+    var elem, self = this;
     this.element.find('.calendar-label').click(function(event){
       if ($(event.target).hasClass('calendar-label-daynote')){
         $(self.element).trigger('Calendar.category-daynote-click', [
@@ -688,34 +700,38 @@ jQuery(document).ready(function($){
   };
 
   Calendar.prototype.positionEvents = function() {
-    if (this.getView() == 'day' || this.getView() == 'week'){
-      this.positionEventsInWeek();
-    }
-    if (this.getView() == 'month'){
-      this.positionEventsInMonth();
+    switch( this.getView() ){
+      case 'day':
+      case 'week':
+        this.positionEventsInWeek();
+        break;
+
+      case 'month':
+        this.positionEventsInMonth();
+        break;
     }
   };
 
   Calendar.prototype.positionEventsInWeek = function() {
-    self = this;
-    zeroLast = 0;
+    var self = this;
+    var zeroLast = 0;
     this.element.find('.calendar-event').each(function(i){
       // Place each event in the grid -> need to set top position and height
-      start = parseInt($(this).attr('data-start'));
-      end = parseInt($(this).attr('data-end'));
-      duration = end - start;
-      zero = parseInt($(this).closest('li.calendar-events-day').attr('data-time'))+(self.conf.weekday.timeline.fromHour*60*60);
+      var start = parseInt($(this).attr('data-start'));
+      var end = parseInt($(this).attr('data-end'));
+      var duration = end - start;
+      var zero = parseInt($(this).closest('li.calendar-events-day').attr('data-time'))+(self.conf.weekday.timeline.fromHour*60*60);
       if (zero > zeroLast){
         zeroLast = zero;
       }
-      eventTop = ((start - zero) / 60 / self.conf.weekday.timeline.intervalMinutes * self.conf.weekday.timeline.heightPx) - 1;
-      eventHeight = (duration / 60 / self.conf.weekday.timeline.intervalMinutes * self.conf.weekday.timeline.heightPx) + 1;
+      var eventTop = ((start - zero) / 60 / self.conf.weekday.timeline.intervalMinutes * self.conf.weekday.timeline.heightPx) - 1;
+      var eventHeight = (duration / 60 / self.conf.weekday.timeline.intervalMinutes * self.conf.weekday.timeline.heightPx) + 1;
 
-      endsOnCurrent = 0;
-      nbEventNotOnCurrent = false;
-      nbEventOnCurrent = 0;
-      tmp = [];
-      currentElement = $(this);
+      var endsOnCurrent = 0;
+      var nbEventNotOnCurrent = false;
+      var nbEventOnCurrent = 0;
+      var tmp = [];
+      var currentElement = $(this);
       $(this).closest('ul').find('li.calendar-event').each(function(j, e){
         if ($(e)[0] != currentElement[0]){
           if (parseInt(currentElement.attr('data-start')) < parseInt($(e).attr('data-end')) && parseInt(currentElement.attr('data-end')) > parseInt($(e).attr('data-start'))) {
@@ -761,14 +777,15 @@ jQuery(document).ready(function($){
       currentElement.attr('data-events', nbEventNotOnCurrent + 1);
       currentElement.attr('data-divider', nbEventNotOnCurrent + 1);
 
-      for (var i=0; i<tmp.length; i++){
+      i = tmp.length;
+      while(i--){
         if (parseInt(tmp[i].attr('data-divider')) > parseInt(currentElement.attr('data-divider'))){
           currentElement.attr('data-divider', tmp[i].attr('data-divider'));
         }
       }
 
       var positions = [];
-      for (var i=0; i<parseInt(currentElement.attr('data-divider')); i++){
+      for (i=0; i<parseInt(currentElement.attr('data-divider')); i++){
         positions[i] = false;
         for (var j=0; j<tmp.length; j++){
           for (var k=0; k<String(tmp[j].attr('data-positions')).split(',').length; k++){
@@ -782,7 +799,7 @@ jQuery(document).ready(function($){
 
       currentElement.attr('data-positions', -1);
 
-      var i = 0;
+      i = 0;
       while (parseInt(currentElement.attr('data-positions')) == -1){
         if (positions[i] === false){
           currentElement.attr('data-positions', i);
@@ -796,8 +813,8 @@ jQuery(document).ready(function($){
         i++;
       }
 
-      eventWidth = 100 / (parseInt(currentElement.attr('data-divider')) / String(currentElement.attr('data-positions')).split(',').length);
-      eventLeft = (String(currentElement.attr('data-positions')).split(',')[0] / parseInt(currentElement.attr('data-divider'))) * 100;
+      var eventWidth = 100 / (parseInt(currentElement.attr('data-divider')) / String(currentElement.attr('data-positions')).split(',').length);
+      var eventLeft = (String(currentElement.attr('data-positions')).split(',')[0] / parseInt(currentElement.attr('data-divider'))) * 100;
 
       self.setEventPosition(this, eventTop, eventHeight, eventLeft, eventWidth);
     });
@@ -834,7 +851,8 @@ jQuery(document).ready(function($){
   };
 
   Calendar.prototype.weekDrawEvents = function() {
-    for (var i=0; i<this.events.length; i++){
+    var e, i, day, fromHour, toHour, interval, n = this.events.length;
+    for (i=0; i<n; i++){
       e = this.events[i];
       day = false;
       fromHour = this.conf.weekday.timeline.fromHour;
@@ -865,10 +883,11 @@ jQuery(document).ready(function($){
   };
 
   Calendar.prototype.weekDrawDaynotes = function() {
-    for (var i=0; i<this.daynotes.length; i++){
+    var i, e, day, n = this.daynotes.length;
+    for (i=0; i<n; i++){
       e = this.daynotes[i];
       day = false;
-      $(this.element).find('.calendar-events-day').each(function(i, d){
+      $(this.element).find('.calendar-events-day').each(function(m, d){
         if (parseInt(moment.unix(e.time).startOf('day').format('X')) == parseInt($(d).attr('data-time'))) {
           day = d;
         }
@@ -877,7 +896,7 @@ jQuery(document).ready(function($){
       if (day === false){
         //console.warn('Event '+i+' out of current view');
       }else{
-        color = this.getDaynoteCategoryColor(e.category);
+        var color = this.getDaynoteCategoryColor(e.category);
         var from = this.conf.weekday.timeline.fromHour;
         var toHour = this.conf.weekday.timeline.toHour + parseInt(this.conf.weekday.timeline.intervalMinutes / 60);
         var toMin = ((this.conf.weekday.timeline.intervalMinutes / 60) - parseInt(this.conf.weekday.timeline.intervalMinutes / 60))*60;
@@ -898,8 +917,8 @@ jQuery(document).ready(function($){
   };
 
   Calendar.prototype.drawEventsOrDaynotes = function(e, index, start, end, title, content, category, color, time_interval, classes) {
-    var li = $('<li>');
-    for (var i=0; i<classes.length; i++){
+    var li = $('<li>'), i = classes.length;
+    while(i--) {
       li.addClass(classes[i]);
     }
     li.attr('data-index', index);
@@ -931,10 +950,11 @@ jQuery(document).ready(function($){
   };
 
   Calendar.prototype.monthDrawEvents = function() {
-    for (var i=0; i<this.events.length; i++){
+    var i, e, day, n = this.events.length;
+    for (i=0; i<n; i++){
       e = this.events[i];
       day = false;
-      $(this.element).find('.calendar-month-events-day').each(function(i, d){
+      $(this.element).find('.calendar-month-events-day').each(function(m, d){
         if (e.start >= (parseInt($(d).attr('data-time-from'))) && e.end <= (parseInt($(d).attr('data-time-to')))){
           day = d;
         }
@@ -959,10 +979,11 @@ jQuery(document).ready(function($){
   };
 
   Calendar.prototype.monthDrawDaynotes = function() {
-    for (var i=0; i<this.daynotes.length; i++){
+    var i, e, day, n = this.daynotes.length;
+    for (i=0; i<n; i++){
       e = this.daynotes[i];
       day = false;
-      $(this.element).find('.calendar-month-events-day').each(function(i, d){
+      $(this.element).find('.calendar-month-events-day').each(function(m, d){
         if (e.time >= (parseInt($(d).attr('data-time-from'))) && e.time <= (parseInt($(d).attr('data-time-to')))){
           day = d;
         }
@@ -1076,7 +1097,7 @@ jQuery(document).ready(function($){
   };
 
   Calendar.prototype.clickEventOrDaynote = function() {
-    self = this;
+    var self = this;
     this.element.find('.calendar-event').each(function(){
       $(this).click(function(event){
         elem = $(event.target);
@@ -1101,7 +1122,8 @@ jQuery(document).ready(function($){
   };
 
   Calendar.prototype.resizeTimeline = function() {
-    for (var j=0; j<this.events.length; j++){
+    var j = this.events.length;
+    while(j--) {
       if (parseInt(moment.unix(this.events[j].start).format('HH')) < this.conf.weekday.timeline.fromHour){
         this.conf.weekday.timeline.fromHour = parseInt(moment.unix(this.events[j].start).format('HH'));
       }
@@ -1138,7 +1160,7 @@ jQuery(document).ready(function($){
   Calendar.prototype.addBtnLeftRight = function() {
     var self = this;
     this.element.find('.btn-move-calendar').click(function(event){
-      elem = $(event.target);
+      var elem = $(event.target);
       if (elem.prop('nodeName') !== 'BUTTON'){
         elem = elem.closest('.btn-move-calendar');
       }
@@ -1231,7 +1253,7 @@ jQuery(document).ready(function($){
   };
 
   Calendar.prototype.moveCurrentIntervalView = function(direction) {
-    var word;
+    var word, self = this;
     if (this.getView() == 'day'){
       word = 'days';
     }
@@ -1251,10 +1273,7 @@ jQuery(document).ready(function($){
   };
 
   Calendar.prototype.mobileQuery = function() {
-    if ($(window).width() < this.conf.defaultView.smallScreenThreshold){
-      return 'mobile'
-    }
-    return 'desktop';
+    return $(window).width() < this.conf.defaultView.smallScreenThreshold ? 'mobile' : 'desktop';
   };
 
   Calendar.prototype.hexToRgb = function(hex) {
@@ -1277,26 +1296,28 @@ jQuery(document).ready(function($){
   };
 
   Calendar.prototype.getCategories = function(object, attribute1, attribute2){
-    var categories = [];
-    for (var i=0; i<object.length; i++){
+    var categories = [], e, n = object.length, fromTimeStamp = parseInt(this.fromTimestamp), toTimeStamp = parseInt(this.toTimestamp);
+    for (var i=0; i<n; i++){
       e = object[i];
-      if (parseInt(e[attribute1]) >= parseInt(this.fromTimestamp) && parseInt(e[attribute2]) <= parseInt(this.toTimestamp)){
+      if ( parseInt(e[attribute1]) >= fromTimeStamp && parseInt(e[attribute2]) <= toTimeStamp ){
         categories.push(e.category);
       }
     }
-    categories = this.miscUniqueArray(categories);
-    return categories;
+    return this.miscUniqueArray(categories);
   };
 
   Calendar.prototype.getCategoryColor = function(category, object, colors, color) {
-    for (var i=0; i<object.length; i++){
+    var used, j, i = object.length;
+    while(i--) {
       if (object[i].category == category){
         return object[i].color;
       }
     }
-    for (var i=0; i<colors.length; i++){
+
+    for (i=0; i<colors.length; i++){
       used = false;
-      for (var j=0; j<object.length; j++){
+      j = object.length;
+      while(j--) {
         if (object[j].color == colors[i]){
           used = true;
         }
@@ -1319,7 +1340,8 @@ jQuery(document).ready(function($){
   Calendar.prototype.determineEventsCategories = function() {
     var categories = this.getEventsCategories();
     this.eventCategoryColor = (this.userEventCategoryColor.length > 0) ? this.userEventCategoryColor : [];
-    for (var i=0; i<categories.length; i++){
+    var i = categories.length;
+    while(i--) {
       this.getEventCategoryColor(categories[i]);
     }
   };
@@ -1343,7 +1365,8 @@ jQuery(document).ready(function($){
   Calendar.prototype.determineDaynotesCategories = function() {
     var categories = this.getDaynotesCategories();
     this.daynoteCategoryColor = (this.userDaynoteCategoryColor.length > 0) ? this.userDaynoteCategoryColor : [];
-    for (var i=0; i<categories.length; i++){
+    var i = categories.length;
+    while(i--){
       this.getDaynoteCategoryColor(categories[i]);
     }
   };
@@ -1419,45 +1442,22 @@ jQuery(document).ready(function($){
   };
 
   Calendar.prototype.getNextViewInterval = function() {
-    if (this.getView() == 'day'){
-      return [
-        parseInt(moment.unix(this.fromTimestamp).add(1, 'd').format('X')),
-        parseInt(moment.unix(this.toTimestamp).add(1, 'd').format('X'))
-      ];
-    }
-    if (this.getView() == 'week'){
-      return [
-        parseInt(moment.unix(this.fromTimestamp).add(1, 'w').format('X')),
-        parseInt(moment.unix(this.toTimestamp).add(1, 'w').format('X'))
-      ];
-    }
-    if (this.getView() == 'month'){
-      return [
-        parseInt(moment.unix(this.fromTimestamp).add(1, 'M').format('X')),
-        parseInt(moment.unix(this.toTimestamp).add(1, 'M').format('X'))
-      ];
-    }
+    var add = {'day':'d','week':'w','month':'M'};
+    add = add[this.getView()];
+    return [
+      parseInt(moment.unix(this.fromTimestamp).add(1, add).format('X')),
+      parseInt(moment.unix(this.toTimestamp).add(1, add).format('X'))
+    ];
+
   };
 
   Calendar.prototype.getPrevViewInterval = function() {
-    if (this.getView() == 'day'){
-      return [
-        parseInt(moment.unix(this.fromTimestamp).subtract(1, 'd').format('X')),
-        parseInt(moment.unix(this.toTimestamp).subtract(1, 'd').format('X'))
-      ];
-    }
-    if (this.getView() == 'week'){
-      return [
-        parseInt(moment.unix(this.fromTimestamp).subtract(1, 'w').format('X')),
-        parseInt(moment.unix(this.toTimestamp).subtract(1, 'w').format('X'))
-      ];
-    }
-    if (this.getView() == 'month'){
-      return [
-        parseInt(moment.unix(this.fromTimestamp).subtract(1, 'M').format('X')),
-        parseInt(moment.unix(this.toTimestamp).subtract(1, 'M').format('X'))
-      ];
-    }
+    var sub = {'day':'d','week':'w','month':'M'};
+    sub = sub[this.getView()];
+    return [
+      parseInt(moment.unix(this.fromTimestamp).subtract(1, sub).format('X')),
+      parseInt(moment.unix(this.toTimestamp).subtract(1, sub).format('X'))
+    ];
   };
 
   Calendar.prototype.getTimestamp = function() {
@@ -1505,7 +1505,7 @@ jQuery(document).ready(function($){
     return s.charAt(0).toUpperCase() + s.slice(1);
   };
 
-  objSchedulesPlan = [];
+  var objSchedulesPlan = [];
 
   // Initialization
   jQuery.extend(jQuery.fn, {
@@ -1518,7 +1518,7 @@ jQuery(document).ready(function($){
 
   // Reinitialization on screen rotation
   var resizeListener1;
-  pause1 = 500;
+  var pause1 = 500;
   window.addEventListener("orientationchange", function() {
     clearTimeout(resizeListener1);
     resizeListener1 = setTimeout(function(){
@@ -1530,7 +1530,7 @@ jQuery(document).ready(function($){
 
   // Reinitialization on screen resize if not mobile
   var resizeListener2;
-  pause2 = 500;
+  var pause2 = 500;
   window.addEventListener("resize", function() {
     clearTimeout(resizeListener2);
     resizeListener2 = setTimeout(function(){
