@@ -1406,7 +1406,7 @@ jQuery(document).ready(function($){
   };
 
   Calendar.prototype.addDaynotes = function(daynotes) {
-    this.daynotes.concat(daynotes);
+    this.daynotes = this.daynotes.concat(daynotes);
     this.daynotes.sort(function(a,b) {return (a.start > b.start) ? 1 : -1;});
   };
 
